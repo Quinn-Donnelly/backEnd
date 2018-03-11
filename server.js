@@ -73,3 +73,6 @@ if (env === 'production') {
     console.log(`API server started at http://localhost:${config.devPort}`);
   });
 }
+
+// Export the server for testing
+module.exports = app;

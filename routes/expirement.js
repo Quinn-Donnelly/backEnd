@@ -60,7 +60,6 @@ router.route('/')
       return;
     }
 
-    console.log(results.length);
     res.status(200).json(new jsonResponse(null, results));
   })
   .post(async (req, res) => {

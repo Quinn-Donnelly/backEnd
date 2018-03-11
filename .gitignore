@@ -1,2 +1,9 @@
 node_modules/
 config/database-config.json
+
+# Exclude data files in the utils path
+utils/*.csv
+utils/*.txt
+utils/*.json
+utils/*.sql
+utils/*.uml

@@ -23,7 +23,6 @@ app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
 // Set up middleware for the API server
-app.use(morgan('dev'));
 app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -63,12 +62,14 @@ app.use(function(err, req, res, next) {
 });
 
 // Creating a section for dev configs and prod configs
-if (env === 'development') {
-  app.listen(config.devPort, () => {
-    console.log(`API server started at http://localhost:${config.devPort}`);
-  });
-} else {
+if (env === 'production') {
+  app.use(morgan('common'));
   app.listen(config.prodPort, () => {
     console.log(`API server started at http://localhost:${config.prodPort}`);
+  });
+} else {
+  app.use(morgan('dev'));
+  app.listen(config.devPort, () => {
+    console.log(`API server started at http://localhost:${config.devPort}`);
   });
 }

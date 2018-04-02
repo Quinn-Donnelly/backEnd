@@ -13,7 +13,7 @@
    *Note that on linux systems this will need to be done as __sudo__*
    ```
    npm install -g cross-env
-   npm install -g squelize-cli
+   npm install -g sequelize-cli
    npm install -g (mysql2 or sqlite3)
    ```
 

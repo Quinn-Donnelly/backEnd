@@ -8,6 +8,8 @@ node_js:
 script:
   - npm run lint
 
+after_success: 'npm run coveralls'
+
 notifications:
   email:
     on_failure: change

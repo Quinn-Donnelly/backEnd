@@ -7,3 +7,7 @@ utils/*.txt
 utils/*.json
 utils/*.sql
 utils/*.uml
+
+# Exclude directories for testing
+.nyc_output/
+coverage/

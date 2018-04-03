@@ -6,9 +6,18 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development nodemon server.js",
     "test": "npm run test-unit && npm run test-integration",
-    "test-unit": "cross-env NODE_ENV=test ./node_modules/.bin/mocha test/unit/*.test.js --exit --reporter spec",
-    "test-integration": "cross-env NODE_ENV=test ./node_modules/.bin/mocha test/integration/*.test.js --exit",
+    "test-unit": "cross-env NODE_ENV=test ./node_modules/.bin/mocha test/unit/*.test.js --exit --reporter=nyan",
+    "test-integration": "cross-env NODE_ENV=test ./node_modules/.bin/mocha test/integration/*.test.js --exit --reporter=nyan",
     "lint": "eslint .",
+    "coverage": "nyc npm run test && npm run coverage:file",
+    "coverage:file": "nyc report --reporter=text-lcov  > coverage/lcov.info",
+    "coveralls": "npm run coverage && nyc report --reporter=text-lcov | coveralls",
+    "init:db": "npm run init:database && npm run init:tables",
+    "init:database": "./node_modules/sequelize-cli/lib/sequelize db:create",
+    "init:tables": "./node_modules/sequelize-cli/lib/sequelize db:migrate",
+    "init:db:test": "npm run init:database:test && npm run init:tables:test",
+    "init:database:test": "./node_modules/sequelize-cli/lib/sequelize db:create --env test",
+    "init:tables:test": "./node_modules/sequelize-cli/lib/sequelize db:migrate --env test",
     "parse": "ruby utils/parse_csv.rb"
   },
   "repository": {

@@ -67,14 +67,16 @@ fields.each_with_index do |field, index|
     end
   end
   label = headers[index % headers.size].split('_').each(&:capitalize!).join(' ')
-  format_strings =["{ type: '#{field}', label: '#{label}' name:'#{headers[index]}' },", "#{headers[index]}:#{field}", "+ #{headers[index]}:#{field}", "#{index % headers.size == 0 ? "\t{\n" : ""}\t\t#{headers[index % headers.size]}: #{type && type == 'string' ? "'" : ""}#{field}#{type && type == 'string' ? "'" : ""}#{index % headers.size == headers.size - 1 ? ",\n\t}" : ""}","#{index % headers.size == 0 ? "\t{\n" : ""}\t\t#{headers[index % headers.size]}: #{type && type == 'string' ? "'" : ""}#{field}#{type && type == 'string' ? "'" : ""}#{index % headers.size == headers.size - 1 ? ",\n\t}" : ""}"]
+  format_strings =["{ type: '#{field}', label: '#{label}' name:'#{headers[index]}' },", "#{headers[index]}:#{field}", "+ #{headers[index]}:#{field}", "#{index % headers.size == 0 ? "\t{\n" : ""}\t\t#{headers[index % headers.size]}: #{type && type == 'string' ? "\"" : ""}#{field}#{type && type == 'string' ? "\"" : ""}#{index % headers.size == headers.size - 1 ? ",\n\t}" : ""}","#{index % headers.size == 0 ? "\t{\n" : ""}\t\t#{headers[index % headers.size]}: #{type && type == 'string' ? "\"" : ""}#{field}#{type && type == 'string' ? "'\"" : ""}#{index % headers.size == headers.size - 1 ? ",\n\t}" : ""}"]
   combined.push format_strings[current_type]
 end
 
 combined_string = combined.join(join_string[current_type])
 
-combined_string += ",\n];" if output_type == "TESTDATA" || output_type == 'SEEDDATA'
-combined_string = "[\n" + combined_string if output_type == "TESTDATA" || output_type == 'SEEDDATA'
+if output_type == "TESTDATA" || output_type == "SEEDDATA"
+  combined_string += ",\n];\n\nmodule.exports = testData" 
+  combined_string = "/* eslint-disable */\nconst testData = [\n" + combined_string 
+end
 
 File.open("#{File.dirname(filename)}/#{File.basename(filename, ".csv")}.#{types[current_type].downcase}", 'w') do |file|
   file.write(combined_string)

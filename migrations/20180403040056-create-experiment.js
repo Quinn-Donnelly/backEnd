@@ -27,13 +27,13 @@ module.exports = {
         type: Sequelize.STRING
       },
       assay_source_desc: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
       },
       assay_name: {
         type: Sequelize.STRING
       },
       assay_desc: {
-        type: Sequelize.FLOAT
+        type: Sequelize.TEXT
       },
       timepoint_hr: {
         type: Sequelize.INTEGER
@@ -54,13 +54,13 @@ module.exports = {
         type: Sequelize.STRING
       },
       cell_short_name: {
-        type: Sequelize.FLOAT
+        type: Sequelize.STRING
       },
       cell_growth_mode: {
         type: Sequelize.STRING
       },
       assay_footprint: {
-        type: Sequelize.FLOAT
+        type: Sequelize.STRING
       },
       assay_format_type: {
         type: Sequelize.STRING
@@ -75,16 +75,16 @@ module.exports = {
         type: Sequelize.STRING
       },
       dilution_solvent_percent_max: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT
       },
       assay_component_name: {
         type: Sequelize.STRING
       },
       assay_component_desc: {
-        type: Sequelize.FLOAT
+        type: Sequelize.TEXT
       },
       assay_component_target_desc: {
-        type: Sequelize.FLOAT
+        type: Sequelize.TEXT
       },
       parameter_readout_type: {
         type: Sequelize.STRING
@@ -132,13 +132,13 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       assay_component_endpoint_desc: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
       },
       assay_function_type: {
         type: Sequelize.STRING
       },
       normalized_data_type: {
-        type: Sequelize.FLOAT
+        type: Sequelize.STRING
       },
       analysis_direction: {
         type: Sequelize.STRING
@@ -168,13 +168,13 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       reagent_arid: {
-        type: Sequelize.FLOAT
+        type: Sequelize.STRING
       },
       reagent_reagent_name_value: {
-        type: Sequelize.FLOAT
+        type: Sequelize.TEXT
       },
       reagent_reagent_name_value_type: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
       },
       reagent_culture_or_assay: {
         type: Sequelize.STRING

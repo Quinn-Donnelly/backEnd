@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const expirement = require('../models').expirement;
+const experiment = require('../models').experiment;
 const jsonResponse = require('../utils/response');
 
 // Limit default on queries
 const DEFAULT_RETURN_LIMIT = 25;
 
 /**
- * This will define the routes to be preformed on the  expirement model
+ * This will define the routes to be preformed on the  experiment model
  *
  * path = /
  * @func GET
@@ -74,7 +74,7 @@ router.route('/')
 
     let results;
     try {
-      results = await expirement.findAll({limit, where: queryOptions});
+      results = await experiment.findAll({limit, where: queryOptions});
     } catch (err) {
       res.status(500).json(new jsonResponse(`Error in query: ${err}`));
       return;
@@ -86,14 +86,14 @@ router.route('/')
     let writeResult;
     try {
       const options = Object.assign({}, req.body);
-      writeResult = await expirement.build(options).save();
+      writeResult = await experiment.build(options).save();
     } catch (err) {
       res.status(500).json(new jsonResponse(err));
       return;
     }
 
     res.status(201)
-      .location(`/expirement/${writeResult.dataValues.id}`)
+      .location(`/experiment/${writeResult.dataValues.id}`)
       .json(new jsonResponse(null, writeResult.dataValues));
   })
   .put(async (req, res) => {
@@ -130,7 +130,7 @@ router.route('/')
           );
           return;
         }
-        const resource = await expirement.findById(id);
+        const resource = await experiment.findById(id);
         if (resource === null) {
           res.status(404).json(new jsonResponse('resource not found'));
           return;
@@ -150,7 +150,7 @@ router.route('/')
           );
           return;
         }
-        let resource = await expirement.findById(id);
+        let resource = await experiment.findById(id);
         if (resource === null) {
           res.status(404).json(new jsonResponse('resource not found'));
           return;
@@ -192,7 +192,7 @@ router.route('/')
       }
 
       try {
-        let instance = await expirement.findById(id);
+        let instance = await experiment.findById(id);
         if (instance === null) {
           res.status(404).json(new jsonResponse('resource not found'));
           return;
@@ -219,7 +219,7 @@ router.route('/')
           );
           return;
         }
-        instance = await expirement.findById(id);
+        instance = await experiment.findById(id);
       } catch (err) {
         res.status(500)
            .json(new jsonResponse(`error loading instance, ${err}`));
@@ -242,7 +242,7 @@ router.route('/')
     });
 
 /**
- * This will find one instanse of the  expirement model with matching prymaryKey
+ * This will find one instanse of the  experiment model with matching prymaryKey
  * @param {Object} req This is the request object for express
  * @param  {int} req.query.id The prymaryKey for the model to query
  * @param  {Object} res Response object for express
@@ -255,7 +255,7 @@ async function findOne(req, res) {
 
  try {
    const id = String(req.query.id);
-   const selection = await expirement.findById(id);
+   const selection = await experiment.findById(id);
    if (selection === null) {
      res.status(404).json(new jsonResponse(`Entry with id=${id} not found`));
      return;

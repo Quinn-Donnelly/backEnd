@@ -13,42 +13,7 @@ const expect = chai.expect;
 // reuse sake
 const TRASH_ID = 21321;
 
-const testData = [
-  {
-    citation_id: 1,
-    pmid: 1,
-    doi: 'This is a doi',
-    other_source: 'Im the other one',
-    other_id: 1,
-    citation: 'I WENT DOWNTOWN TO THE ZOO AND THEY ALL ASKED FOR YOU',
-    title: 'THE BEST PROGRAMMER',
-    author: 'Quinjamin Button',
-    url: 'https://testytesty.com',
-  },
-  {
-    citation_id: 1,
-    pmid: 1,
-    doi: 'This is a doi',
-    other_source: 'Im the other one',
-    other_id: 1,
-    citation: 'I WENT DOWNTOWN TO THE ZOO AND THEY ALL ASKED FOR YOU',
-    title: 'THE BEST PROGRAMMER',
-    author: 'Quinjamin Button',
-    url: 'https://testytesty.com',
-  },
-  {
-    citation_id: 1,
-    pmid: 1,
-    doi: 'This is a doi',
-    other_source: 'Im the other one',
-    other_id: 1,
-    citation: 'I WENT DOWNTOWN TO THE ZOO AND THEY ALL ASKED FOR YOU',
-    title: 'THE BEST PROGRAMMER',
-    author: 'Quinjamin Button',
-    url: 'https://testytesty.com',
-  },
-];
-
+const testData = require('../../data/citation_test_data');
 
 chai.use(chaiHttp);
 

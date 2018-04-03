@@ -6,8 +6,8 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development nodemon server.js",
     "test": "npm run test-unit && npm run test-integration",
-    "test-unit": "cross-env NODE_ENV=test ./node_modules/.bin/mocha test/unit/*.test.js --exit --reporter=nyan",
-    "test-integration": "cross-env NODE_ENV=test ./node_modules/.bin/mocha test/integration/*.test.js --exit --reporter=nyan",
+    "test-unit": "cross-env NODE_ENV=test ./node_modules/.bin/mocha test/unit/*.test.js --exit",
+    "test-integration": "cross-env NODE_ENV=test ./node_modules/.bin/mocha test/integration/*.test.js --exit",
     "lint": "eslint .",
     "coverage": "nyc npm run test && npm run coverage:file",
     "coverage:file": "nyc report --reporter=text-lcov  > coverage/lcov.info",

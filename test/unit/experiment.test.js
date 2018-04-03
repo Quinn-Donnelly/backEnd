@@ -3,7 +3,7 @@ process.env.NODE_ENV = 'test';
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('../../server');
-const citation = require('../../models').citation;
+const experiment = require('../../models').experiment;
 
 // Set up different chai methods
 const assert = chai.assert;
@@ -13,55 +13,20 @@ const expect = chai.expect;
 // reuse sake
 const TRASH_ID = 21321;
 
-const testData = [
-  {
-    citation_id: 1,
-    pmid: 1,
-    doi: 'This is a doi',
-    other_source: 'Im the other one',
-    other_id: 1,
-    citation: 'I WENT DOWNTOWN TO THE ZOO AND THEY ALL ASKED FOR YOU',
-    title: 'THE BEST PROGRAMMER',
-    author: 'Quinjamin Button',
-    url: 'https://testytesty.com',
-  },
-  {
-    citation_id: 1,
-    pmid: 1,
-    doi: 'This is a doi',
-    other_source: 'Im the other one',
-    other_id: 1,
-    citation: 'I WENT DOWNTOWN TO THE ZOO AND THEY ALL ASKED FOR YOU',
-    title: 'THE BEST PROGRAMMER',
-    author: 'Quinjamin Button',
-    url: 'https://testytesty.com',
-  },
-  {
-    citation_id: 1,
-    pmid: 1,
-    doi: 'This is a doi',
-    other_source: 'Im the other one',
-    other_id: 1,
-    citation: 'I WENT DOWNTOWN TO THE ZOO AND THEY ALL ASKED FOR YOU',
-    title: 'THE BEST PROGRAMMER',
-    author: 'Quinjamin Button',
-    url: 'https://testytesty.com',
-  },
-];
-
+const testData = require('../../data/experiment_test_data');
 
 chai.use(chaiHttp);
 
-describe('citation', () => {
+describe('experiment', () => {
   // Preformed before each test (clears the data in the table)
   beforeEach(async () => {
-    await citation.destroy({truncate: true});
+    await experiment.destroy({truncate: true});
   });
 
-  describe('/citation GET', () => {
-    it('Should return empty array when there is no citations', async () => {
+  describe('/experiment GET', () => {
+    it('Should return empty array when there is no experiments', async () => {
       try {
-        const res = await chai.request(server).get('/citation');
+        const res = await chai.request(server).get('/experiment');
         // Test the headers
         expect(res.status).to.equal(200);
 
@@ -75,12 +40,12 @@ describe('citation', () => {
       }
     });
 
-    it('Should return all citations', async () => {
+    it('Should return all experiments', async () => {
       // NOTE: This test does not test mutations of given data
       try {
-        await citation.bulkCreate(testData);
+        await experiment.bulkCreate(testData);
 
-        const res = await chai.request(server).get('/citation');
+        const res = await chai.request(server).get('/experiment');
         // Test the headers
         expect(res.status).to.equal(200);
 
@@ -93,15 +58,15 @@ describe('citation', () => {
     it('Should allow the user set a limit on entries returned', async () => {
       let res;
       try {
-        await citation.bulkCreate(testData);
-        res = await chai.request(server).get('/citation?limit=2');
+        await experiment.bulkCreate(testData);
+        res = await chai.request(server).get('/experiment?limit=2');
         expect(res.body.payload.length).to.equal(2);
       } catch (err) {
         assert.fail(true, false, err);
       }
 
       try {
-        res = await chai.request(server).get('/citation?limit=ohno');
+        res = await chai.request(server).get('/experiment?limit=ohno');
       } catch (err) {
         expect(err.response.body.success).to.equal(false);
         expect(err.response.body.payload).to.be.null;
@@ -110,16 +75,20 @@ describe('citation', () => {
     });
   });
 
-  describe('/citation POST', () => {
+  describe('/experiment POST', () => {
     it('Should have have appropriate headers', async () => {
-      const testDataElem = testData[0];
-      const res = await chai.request(server)
-      .post('/citation')
-      .send(testDataElem);
+      try {
+        const testDataElem = testData[0];
+        const res = await chai.request(server)
+        .post('/experiment')
+        .send(testDataElem);
 
-      expect(res.headers.location, 'Should have location header set')
-            .to.match(new RegExp('/citation/*[0-9]'));
-      expect(res.status).to.equal(201);
+        expect(res.headers.location, 'Should have location header set')
+              .to.match(new RegExp('/experiment/*[0-9]'));
+        expect(res.status).to.equal(201);
+      } catch (err) {
+        assert.fail(true, false, err);
+      }
     });
 
     it('Should filter out extra fields', async () => {
@@ -127,7 +96,7 @@ describe('citation', () => {
         let testDataElem = testData[0];
         testDataElem['notValidProp'] = 'Please go away';
         const res = await chai.request(server)
-        .post('/citation')
+        .post('/experiment')
         .send(testDataElem);
 
         delete testDataElem.notValidProp;
@@ -140,11 +109,11 @@ describe('citation', () => {
     });
   });
 
-  describe('/citation PUT', () => {
+  describe('/experiment PUT', () => {
     it('Should return a 405', async () => {
       try {
         await chai.request(server)
-        .put(`/citation`);
+        .put(`/experiment`);
         assert.fail(true, false, 'Request should throw error');
       } catch (err) {
         expect(err.response.status).to.equal(405);
@@ -155,11 +124,11 @@ describe('citation', () => {
     });
   });
 
-  describe('/citation PATCH', () => {
+  describe('/experiment PATCH', () => {
     it('Should return a 405', async () => {
       try {
         await chai.request(server)
-        .patch(`/citation`);
+        .patch(`/experiment`);
         assert.fail(true, false, 'Request should throw error');
       } catch (err) {
         expect(err.response.status).to.equal(405);
@@ -170,11 +139,11 @@ describe('citation', () => {
     });
   });
 
-  describe('/citation DELETE', () => {
+  describe('/experiment DELETE', () => {
     it('Should return a 405', async () => {
       try {
         await chai.request(server)
-        .delete(`/citation`);
+        .delete(`/experiment`);
         assert.fail(true, false, 'Request should throw error');
       } catch (err) {
         expect(err.response.status).to.equal(405);
@@ -185,14 +154,14 @@ describe('citation', () => {
     });
   });
 
-  describe('/citation/:id GET', () => {
-    it('Should return one citation matching the id', async () => {
+  describe('/experiment/:id GET', () => {
+    it('Should return one experiment matching the id', async () => {
       try {
         const testDataElem = testData[0];
-        const writeResult = await citation.create(testDataElem);
+        const writeResult = await experiment.create(testDataElem);
 
         const res = await chai.request(server)
-        .get(`/citation/${writeResult.dataValues.id}`);
+        .get(`/experiment/${writeResult.dataValues.id}`);
 
         expect(res.status).to.equal(200);
         expect(res.body.payload).to.be.an('object');
@@ -204,7 +173,7 @@ describe('citation', () => {
 
     it('Should return 404 if non existant', async () => {
       try {
-        await chai.request(server).get(`/citation/${TRASH_ID}`);
+        await chai.request(server).get(`/experiment/${TRASH_ID}`);
         assert.fail(true, false, 'GET request should have failed with 404');
       } catch (err) {
         expect(err.status).to.equal(404);
@@ -212,10 +181,10 @@ describe('citation', () => {
     });
   });
 
-  describe('/citation/:id POST', () => {
+  describe('/experiment/:id POST', () => {
     it('Should reutrn a 404 when resource does not exist', async () => {
       try {
-        await chai.request(server).post(`/citation/${TRASH_ID}`);
+        await chai.request(server).post(`/experiment/${TRASH_ID}`);
       } catch (err) {
         expect(err.response.status).to.equal(404);
       }
@@ -224,7 +193,7 @@ describe('citation', () => {
     it('Should return a 409 if the resource exists', async () => {
       let writeResult;
       try {
-        writeResult = await citation.create(testData[0]);
+        writeResult = await experiment.create(testData[0]);
       } catch (err) {
         console.error(err);
         return;
@@ -232,7 +201,7 @@ describe('citation', () => {
 
       try {
         await chai.request(server).post(
-          `/citation/${writeResult.dataValues.id}`
+          `/experiment/${writeResult.dataValues.id}`
         );
       } catch (err) {
         expect(err.response.status).to.equal(409);
@@ -240,10 +209,10 @@ describe('citation', () => {
     });
   });
 
-  describe('/citation/:id PUT', () => {
+  describe('/experiment/:id PUT', () => {
     it('Should return a 404 when non existant', async () => {
       try {
-        await chai.request(server).put('/citation/12');
+        await chai.request(server).put('/experiment/12');
         assert.fail(true, false, 'PUT request should have failed with 404');
       } catch (err) {
           expect(err.response.status).to.equal(404);
@@ -251,16 +220,16 @@ describe('citation', () => {
     });
 
     it('Should add the new data in body', async () => {
-      const writeResult = await citation.create({});
+      const writeResult = await experiment.create({});
       const res = await chai.request(server)
-                  .put(`/citation/${writeResult.dataValues.id}`)
+                  .put(`/experiment/${writeResult.dataValues.id}`)
                   .send(testData[0]);
       expect(res.status).to.equal(200);
       expect(res.body.payload).to.include(testData[0]);
     });
 
     it('Should clear other values', async () => {
-      const writeResult = await citation.create(testData[0]);
+      const writeResult = await experiment.create(testData[0]);
       const dataKeys = Object.keys(testData[0]);
       const updatedKey = dataKeys[0];
       const updatedValue = testData[1][updatedKey];
@@ -269,7 +238,7 @@ describe('citation', () => {
       const uncheckedFields = [updatedKey];
       try {
         const res = await chai.request(server)
-                    .put(`/citation/${writeResult.dataValues.id}`)
+                    .put(`/experiment/${writeResult.dataValues.id}`)
                     .send(jsonToSend);
         expect(res.status).to.equal(200);
         expect(res.body.payload[updatedKey]).to.equal(updatedValue);
@@ -285,10 +254,10 @@ describe('citation', () => {
     });
   });
 
-  describe('/citation/:id PATCH', () => {
+  describe('/experiment/:id PATCH', () => {
     it('Should return a 404 if non existent', async () => {
       try {
-        await chai.request(server).patch(`/citation/${TRASH_ID}`);
+        await chai.request(server).patch(`/experiment/${TRASH_ID}`);
       } catch (err) {
         expect(err.response.status).to.equal(404);
       }
@@ -297,7 +266,7 @@ describe('citation', () => {
     it('Should return a 400 if the id is incorrect or unspecified',
     async () => {
       try {
-        await chai.request(server).patch(`/citation/ohnoooo`);
+        await chai.request(server).patch(`/experiment/ohnoooo`);
       } catch (err) {
         console.log(err.response.err);
         expect(err.response.status).to.equal(400);
@@ -307,7 +276,7 @@ describe('citation', () => {
     it('Should update the values in body and not change others', async () => {
       let writeResult;
       try {
-        writeResult = await citation.create(testData[0]);
+        writeResult = await experiment.create(testData[0]);
       } catch (err) {
         console.error(err);
         return;
@@ -315,7 +284,7 @@ describe('citation', () => {
 
       try {
         const res = await chai.request(server)
-          .patch(`/citation/${writeResult.dataValues.id}`)
+          .patch(`/experiment/${writeResult.dataValues.id}`)
           .send(testData[1][1]);
 
         const keys = testData[0].keys();
@@ -332,24 +301,24 @@ describe('citation', () => {
     });
   });
 
-  describe('/citation/:id DELETE', () => {
-    it('Should remove the citation matching id', async () => {
-      const writeResult = await citation.bulkCreate(testData);
+  describe('/experiment/:id DELETE', () => {
+    it('Should remove the experiment matching id', async () => {
+      const writeResult = await experiment.bulkCreate(testData);
       const indexToRemove = 1;
       const expectedIds = writeResult.filter(
         (val, idx) => (idx !== indexToRemove)
       ).map((elm) => elm.dataValues.id);
 
       const res = await chai.request(server)
-            .delete(`/citation/${writeResult[indexToRemove].dataValues.id}`);
+            .delete(`/experiment/${writeResult[indexToRemove].dataValues.id}`);
       expect(res.status).to.equal(200);
-      const allcitations = (await citation.findAll()).map(
+      const allexperiments = (await experiment.findAll()).map(
         (elm) => elm.dataValues.id
       );
-      expect(allcitations).to.include.members(expectedIds);
-      expect(allcitations).to.not.include(
+      expect(allexperiments).to.include.members(expectedIds);
+      expect(allexperiments).to.not.include(
         writeResult[indexToRemove].dataValues.id
       );
     });
   });
-}); // End of citation describe
+}); // End of experiment describe

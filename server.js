@@ -13,6 +13,8 @@ const target = require('./routes/target');
 const user = require('./routes/user');
 const citation = require('./routes/citation');
 const chemical = require('./routes/chemical');
+const ChemicalHelper = require('./helpers/chemical');
+const jsonResponse = require('./utils/response');
 
 const env = process.env.NODE_ENV || 'development';
 
@@ -61,6 +63,13 @@ app.use(function(err, req, res, next) {
     message: err.message,
     error: (app.get('env') === 'development') ? err : {},
   });
+});
+
+app.get('/models', async (req, res) => {
+  const chemicalHelper = new ChemicalHelper;
+  const result = await chemicalHelper.basicQuery('ohShit');
+  console.log(result);
+  res.status(200).json(new jsonResponse(null, result));
 });
 
 // Creating a section for dev configs and prod configs

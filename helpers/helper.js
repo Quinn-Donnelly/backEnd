@@ -1,24 +1,25 @@
 const models = require('../models');
 const Op = models.Sequelize.Op;
-const chemical = models.chemical;
+
+// Limit default on queries
+const DEFAULT_RETURN_LIMIT = 25;
 
 /**
  * Class helper for the chemical model that can preform the following
  */
-class ChemicalHelper {
+class Helper {
   /**
    * Sets constants for the model helper
+   * @param {String}  name          This is the name of the model to use
+   * @param {Array}   defaultFields this is the default SELECT for Queries
+   * @param {Integer} defaultLimit  This is default number of entries returned
+   *                                (Optional) will use constant if not given
    */
-  constructor() {
-    this.defaultFields = [
-      'Substance_Name',
-      'Substance_CASRN',
-      'Structure_SMILES',
-      'Structure_InChI',
-      'Structure_Formula',
-      'Structure_MolWt',
-    ];
-    this.defaultLimit = 25;
+  constructor(name, defaultFields, defaultLimit) {
+    this.modelName = name;
+    this.defaultFields = (defaultFields) ? defaultFields : [];
+    this.defaultLimit = (defaultLimit) ? defaultLimit :
+                                               DEFAULT_RETURN_LIMIT;
   }
 
   /**
@@ -39,6 +40,11 @@ class ChemicalHelper {
         limit = options.limit;
       }
 
+      let offset = 0;
+      if (options && options.offset !== undefined && !isNaN(options.offset)) {
+        offset = options.offset;
+      }
+
       let searchParams = [];
       for (let i = 0; i < this.defaultFields.length; i += 1) {
         searchParams.push({
@@ -48,12 +54,11 @@ class ChemicalHelper {
         });
       }
 
-      console.log(searchParams);
-
-      const results = await chemical.findAll(
+      const results = await models[this.modelName].findAll(
         {
           attributes: this.defaultFields,
           limit,
+          offset,
           where: {
             [Op.or]: searchParams,
           },
@@ -64,4 +69,4 @@ class ChemicalHelper {
   }
 }
 
-module.exports = ChemicalHelper;
+module.exports = Helper;

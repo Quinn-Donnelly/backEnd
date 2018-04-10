@@ -13,8 +13,7 @@ const target = require('./routes/target');
 const user = require('./routes/user');
 const citation = require('./routes/citation');
 const chemical = require('./routes/chemical');
-const ChemicalHelper = require('./helpers/chemical');
-const jsonResponse = require('./utils/response');
+const serach = require('./routes/search');
 
 const env = process.env.NODE_ENV || 'development';
 
@@ -54,6 +53,7 @@ app.use('/citation', citation);
 app.use('/target', target);
 app.use('/user', user);
 app.use('/chemical', chemical);
+app.use('/search', serach);
 
 // error handler
 // no stacktraces leaked to user unless in development environment
@@ -63,13 +63,6 @@ app.use(function(err, req, res, next) {
     message: err.message,
     error: (app.get('env') === 'development') ? err : {},
   });
-});
-
-app.get('/models', async (req, res) => {
-  const chemicalHelper = new ChemicalHelper;
-  const result = await chemicalHelper.basicQuery('ohShit');
-  console.log(result);
-  res.status(200).json(new jsonResponse(null, result));
 });
 
 // Creating a section for dev configs and prod configs

@@ -5,7 +5,7 @@ const Op = models.Sequelize.Op;
 const DEFAULT_RETURN_LIMIT = 25;
 
 /**
- * Class helper for the chemical model that can preform the following
+ * Class helper for the models that can preform the following
  */
 class Helper {
   /**

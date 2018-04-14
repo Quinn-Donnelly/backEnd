@@ -23,7 +23,7 @@ def get_type(string)
 end
 
 def low_precedence(type)
-  return type == "null" || type == "string" || type == "integer"
+  return type == "null" || type == "string" || type == "integer" 
 end
 
 CSV.foreach(filename) do |row|
@@ -56,7 +56,7 @@ end
 
 if output_type != "TESTDATA" && output_type != 'SEEDDATA'
   fields.each_with_index do |field, index|
-    fields[index] = "string" if field == "null"
+    fields[index] = "string" if field == "null" 
   end
 end
 
@@ -75,7 +75,7 @@ fields.each_with_index do |field, index|
       field = field[0] == 'T' ? 'true': 'false'
     end
     field = 'null' if field == nil
-    field = field.gsub("\n", "\\n") if type == "string" || type == "text"
+     field = field.gsub("\n", "\\n") if type == "string" || type == "text"
     field = field.gsub("\r", "\\n") if type == "string" || type == "text"
   end
   label = headers[index % headers.size].split('_').each(&:capitalize!).join(' ')
@@ -86,8 +86,8 @@ end
 combined_string = combined.join(join_string[current_type])
 
 if output_type == "TESTDATA" || output_type == "SEEDDATA"
-  combined_string += ",\n];\n\nmodule.exports = testData"
-  combined_string = "/* eslint-disable */\nconst testData = [\n" + combined_string
+  combined_string += ",\n];\n\nmodule.exports = testData" 
+  combined_string = "/* eslint-disable */\nconst testData = [\n" + combined_string 
 end
 
 File.open("#{File.dirname(filename)}/#{File.basename(filename, ".csv")}.#{types[current_type].downcase}", 'w') do |file|

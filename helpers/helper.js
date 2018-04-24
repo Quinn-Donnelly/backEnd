@@ -3,6 +3,7 @@ const Op = models.Sequelize.Op;
 
 // Limit default on queries
 const DEFAULT_RETURN_LIMIT = 25;
+const NUMBERICAL_TYPES = ['DOUBLE PRECISION', 'INTEGER'];
 
 /**
  * Class helper for the models that can preform the following
@@ -20,6 +21,13 @@ class Helper {
     this.defaultFields = (defaultFields) ? defaultFields : [];
     this.defaultLimit = (defaultLimit) ? defaultLimit :
                                                DEFAULT_RETURN_LIMIT;
+    // This will track the types of the defualt fields in a parrelel array to
+    // defaultFields, determines types using model to be dynamic
+    this.defaultFieldTypes = [];
+    const attributes = models[this.modelName].rawAttributes;
+    for (let i = 0; i < this.defaultFields.length; i += 1) {
+      this.defaultFieldTypes.push(attributes[this.defaultFields[i]].type.key);
+    }
   }
 
   /**
@@ -46,12 +54,28 @@ class Helper {
       }
 
       let searchParams = [];
+      // This will generate the seach query using the types of the fields to
+      // search either numerically or string
       for (let i = 0; i < this.defaultFields.length; i += 1) {
-        searchParams.push({
-          [this.defaultFields[i]]: {
-            [Op.like]: `%${queryString}%`,
-          },
-        });
+        if (NUMBERICAL_TYPES.includes(this.defaultFieldTypes[i])) {
+            let queryNum;
+            try {
+              queryNum = parseFloat(queryString);
+            } catch (err) {
+              continue;
+            }
+            searchParams.push({
+              [this.defaultFields[i]]: {
+                [Op.eq]: queryNum,
+              },
+            });
+          } else {
+            searchParams.push({
+              [this.defaultFields[i]]: {
+                [Op.like]: `%${queryString}%`,
+              },
+            });
+          }
       }
 
       const results = await models[this.modelName].findAll(

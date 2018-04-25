@@ -23,12 +23,26 @@ const TARGET_FIELDS = [
   'technological_target_official_symbol',
   'technological_target_gene_symbol',
 ];
+const SUPPORTED_MODELS = [
+  'target',
+  'chemical',
+];
 
 router.route('/')
   .get(async (req, res) => {
     let modelName = (req.query.name) ? req.query.name : null;
     if (modelName == null) {
       res.status(400).json(new jsonResponse('A model name must be specified'));
+      return;
+    }
+
+    if (!SUPPORTED_MODELS.includes(modelName)) {
+      res.status(400).json(
+        new jsonResponse(
+          `The ${modelName} is not supported in the detail API`
+        )
+      );
+      return;
     }
 
     let helper;

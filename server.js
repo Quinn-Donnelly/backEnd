@@ -54,6 +54,8 @@ app.use('/target', target);
 app.use('/user', user);
 app.use('/chemical', chemical);
 app.use('/search', search);
+const modelthings = require('./routes/model');
+app.use('/model', modelthings);
 
 // error handler
 // no stacktraces leaked to user unless in development environment

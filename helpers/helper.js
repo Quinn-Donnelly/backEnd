@@ -50,7 +50,6 @@ class Helper {
       });
     }
 
-    console.log(arr);
     return arr;
   }
 

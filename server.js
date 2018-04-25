@@ -8,12 +8,7 @@ const cookieParser = require('cookie-parser');
 const config = require('./config');
 const passport = require('passport');
 require('./passport')(passport);
-const experiment = require('./routes/experiment');
-const target = require('./routes/target');
-const user = require('./routes/user');
-const citation = require('./routes/citation');
-const chemical = require('./routes/chemical');
-const search = require('./routes/search');
+const routes = require('./routes');
 
 const env = process.env.NODE_ENV || 'development';
 
@@ -48,14 +43,9 @@ app.get('/', (req, res) => {
 
 // when we get ready to authenticate we can use this guy
 // const authenticate = passport.authenticate('jwt', {session: false});
-app.use('/experiment', experiment);
-app.use('/citation', citation);
-app.use('/target', target);
-app.use('/user', user);
-app.use('/chemical', chemical);
-app.use('/search', search);
-const modelthings = require('./routes/model');
-app.use('/model', modelthings);
+Object.keys(routes).forEach((routeName) => {
+  app.use(`/${routeName}`, routes[routeName]);
+});
 
 // error handler
 // no stacktraces leaked to user unless in development environment

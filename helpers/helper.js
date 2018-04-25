@@ -31,6 +31,30 @@ class Helper {
   }
 
   /**
+   * This will provide a list of all attributes, their types, and if they are
+   * a default field for the model (default fields are included in basic query)
+   * // TODO: Once the relations are in the model that information should be
+   *          added to this functions return
+   * @return {Object} describe object returned here
+   */
+  getAttributeList() {
+    const attributes = models[this.modelName].rawAttributes;
+    const keys = Object.keys(attributes);
+    const arr = [];
+
+    for (let i = 0; i < keys.length; i += 1) {
+      arr.push({
+        'name': keys[i],
+        'type': attributes[keys[i]].type.key,
+        'isDefault': this.defaultFields.includes(keys[i]),
+      });
+    }
+
+    console.log(arr);
+    return arr;
+  }
+
+  /**
    * Queries using default options
    * @param  {STRING}  queryString The usrs input non spesific database
    * @param  {Object}  options This will set the options for the query

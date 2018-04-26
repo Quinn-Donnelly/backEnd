@@ -5,6 +5,7 @@ const Helper = require('../helpers/helper');
 const fs = require('fs');
 const path = require('path');
 const shortid = require('shortid');
+const zip = new require('node-zip')();
 
 // Limit default on queries
 const DEFAULT_RETURN_LIMIT = 25;
@@ -47,16 +48,31 @@ buildFile = (obj, name) => {
       }
     }
 
+    let needQuote = false;
     for (let i = 0; i < obj.length; i += 1) {
       for (let j = 0; j < keys.length; j += 1) {
+        needQuote = false;
         if (typeof(obj[i].dataValues[keys[j]]) === 'string') {
           obj[i].dataValues[keys[j]] = obj[i].dataValues[keys[j]]
                                       .replace(/\r?\n|\r/g, '\\n');
+          if (obj[i].dataValues[keys[j]].search(',') !== -1) {
+            output.write('\"');
+            needQuote = true;
+          }
         }
+
         if (j+1 === keys.length) {
           output.write(`${obj[i].dataValues[keys[j]]}\n`);
         } else {
-          output.write(`${obj[i].dataValues[keys[j]]}, `);
+          output.write(`${obj[i].dataValues[keys[j]]}`);
+        }
+
+        if (needQuote) {
+          output.write('\"');
+        }
+
+        if (j+1 !== keys.length) {
+          output.write(',');
         }
       }
     }
@@ -116,17 +132,60 @@ router.route('/basic')
     };
 
     if (req.query.file) {
-      const fileName = `${modelName}-${shortid.generate()}.csv`;
-      await buildFile(results, fileName);
+      const targetFileName = `target-${shortid.generate()}.csv`;
+      const chemicalFileName = `chemical-${shortid.generate()}.csv`;
+
+      const fileConstruction = [];
+      fileConstruction.push(buildFile(result['target'], targetFileName));
+      fileConstruction.push(buildFile(result['chemical'], chemicalFileName));
+
+      await Promise.all(fileConstruction);
+
+      zip.file('target.csv', fs.readFileSync(
+        path.join(__dirname, '../temp', targetFileName)
+      ));
+      zip.file('chemical.csv', fs.readFileSync(
+        path.join(__dirname, '../temp', chemicalFileName)
+      ));
+
+      let data = zip.generate({base64: false, compression: 'DEFLATE'});
+
+      const zipFileName = `zip-${shortid.generate()}.zip`;
+      fs.writeFileSync(
+        path.join(__dirname, '../temp', zipFileName),
+        data,
+        'binary'
+      );
       res.download(
-        path.join(__dirname, '../temp', fileName),
-        `${modelName}.csv`,
+        path.join(__dirname, '../temp', zipFileName),
+        `results.zip`,
         (err) => {
           if (err) console.log(err);
-          fs.unlink(path.join(__dirname, '../temp', fileName), (err) => {
-            if (err) console.log('well shit', err);
+          fs.unlink(path.join(__dirname, '../temp', zipFileName), (err) => {
+            console.log(
+              'Error in basic query file zip delete',
+              err
+            );
           });
-        });
+          fs.unlink(path.join(__dirname, '../temp', chemicalFileName),
+            (err) => {
+              console.log(
+                'Error in basic query file chemical delete',
+                err
+              );
+            }
+          );
+          fs.unlink(path.join(__dirname, '../temp', targetFileName), (err) => {
+            if (err) {
+              console.log(
+                'Error in basic query file target delete',
+                err
+              );
+            }
+          });
+        }
+      );
+
       return;
     }
 
@@ -201,9 +260,15 @@ router.route('/advanced/:model')
         path.join(__dirname, '../temp', fileName),
         `${modelName}.csv`,
         (err) => {
-          if (err) console.log(err);
+          console.log(
+            'Error in advanced query download csv',
+            err
+          );
           fs.unlink(path.join(__dirname, '../temp', fileName), (err) => {
-            console.log('well shit', err);
+            console.log(
+              'Error in advanced query file delete',
+              err
+            );
           });
         });
       return;

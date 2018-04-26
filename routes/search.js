@@ -136,17 +136,25 @@ router.route('/basic')
       const chemicalFileName = `chemical-${shortid.generate()}.csv`;
 
       const fileConstruction = [];
-      fileConstruction.push(buildFile(result['target'], targetFileName));
-      fileConstruction.push(buildFile(result['chemical'], chemicalFileName));
+      if (result.chemical.length !== 0) {
+        fileConstruction.push(buildFile(result['chemical'], chemicalFileName));
+      }
+      if (result.target.length !== 0) {
+        fileConstruction.push(buildFile(result['target'], targetFileName));
+      }
 
       await Promise.all(fileConstruction);
 
-      zip.file('target.csv', fs.readFileSync(
-        path.join(__dirname, '../temp', targetFileName)
-      ));
-      zip.file('chemical.csv', fs.readFileSync(
-        path.join(__dirname, '../temp', chemicalFileName)
-      ));
+      if (result.target.length !== 0) {
+        zip.file('target.csv', fs.readFileSync(
+          path.join(__dirname, '../temp', targetFileName)
+        ));
+      }
+      if (result.chemical.length !== 0) {
+        zip.file('chemical.csv', fs.readFileSync(
+          path.join(__dirname, '../temp', chemicalFileName)
+        ));
+      }
 
       let data = zip.generate({base64: false, compression: 'DEFLATE'});
 
@@ -253,7 +261,12 @@ router.route('/advanced/:model')
     }
 
     // If the user specified they want a file send results in file
-    if (req.query.file) {
+    if (req.query.file && results.length === 0) {
+      res.status(404).json(new jsonResponse('Empty query no matches...'));
+      return;
+    }
+
+    if (req.query.file && results.length !== 0) {
       const fileName = `${modelName}-${shortid.generate()}.csv`;
       await buildFile(results, fileName);
       res.download(

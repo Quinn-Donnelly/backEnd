@@ -114,6 +114,91 @@ class Helper {
       resolve(results);
     });
   }
+
+  /**
+   * [advancedSearch description]
+   * @param  {[type]} query   [description]
+   * @param  {[type]} options [description]
+   * @return {[type]}         [description]
+   */
+  advancedSearch(query, options) {
+    return new Promise(async (resolve, reject) => {
+      let limit = this.defaultLimit;
+      if (options && options.limit !== undefined && options.limit !== null) {
+        limit = options.limit;
+      }
+
+      let offset = 0;
+      if (options && options.offset !== undefined && !isNaN(options.offset)) {
+        offset = options.offset;
+      }
+
+      let searchParams = [];
+      const searchAttributes = Object.keys(query);
+      for (let i = 0; i < searchAttributes.length; i+=1) {
+        if (query[searchAttributes[i]].compareType === 'BETWEEN') {
+          if (!Array.isArray(query[searchAttributes[i]].data)) {
+            reject('compareType BETWEEN requires data to be an array');
+          }
+
+          searchParams.push({
+            [searchAttributes[i]]: {
+              [Op.between]: query[searchAttributes[i]].data,
+            },
+          });
+        } else if (query[searchAttributes[i]].compareType === 'LESSTHAN') {
+          if (Number.isNaN(query[searchAttributes[i]].data)) {
+            reject('compareType LESSTHAN requires data to be a number');
+          }
+
+          searchParams.push({
+            [searchAttributes[i]]: {
+              [Op.lt]: query[searchAttributes[i]].data,
+            },
+          });
+        } else if (query[searchAttributes[i]].compareType === 'GREATERTHAN') {
+          if (Number.isNaN(query[searchAttributes[i]].data)) {
+            reject('compareType GREATERTHAN requires data to be a number');
+          }
+
+          searchParams.push({
+            [searchAttributes[i]]: {
+              [Op.gt]: query[searchAttributes[i]].data,
+            },
+          });
+        } else if (query[searchAttributes[i]].compareType === 'CONTAINS') {
+          searchParams.push({
+            [searchAttributes[i]]: {
+              [Op.like]: `%${query[searchAttributes[i]].data}%`,
+            },
+          });
+        } else if (query[searchAttributes[i]].compareType === 'STARTSWITH') {
+          searchParams.push({
+            [searchAttributes[i]]: {
+              [Op.like]: `${query[searchAttributes[i]].data}%`,
+            },
+          });
+        } else if (query[searchAttributes[i]].compareType === 'ENDSWITH') {
+          searchParams.push({
+            [searchAttributes[i]]: {
+              [Op.like]: `%${query[searchAttributes[i]].data}`,
+            },
+          });
+        }
+      }
+      console.log(searchParams);
+      const results = await models[this.modelName].findAll(
+        {
+          limit,
+          offset,
+          where: {
+            [Op.and]: searchParams,
+          },
+        }
+      );
+      resolve(results);
+    });
+  }
 }
 
 module.exports = Helper;

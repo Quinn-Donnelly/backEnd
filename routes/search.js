@@ -75,4 +75,42 @@ router.route('/basic')
     res.status(200).json(new jsonResponse(null, result));
   });
 
+router.route('/advanced/:model')
+  .get(async (req, res) => {
+    const modelName = (req.params.model) ? req.params.model : null;
+    if (!modelName) {
+      res.status(400).josn(new jsonResponse(
+        'Model must be specified in the advanced search'
+      ));
+      return;
+    }
+
+    const query = (req.query.q) ? req.query.q : null;
+    if (!query) {
+      res.status(400).json(new jsonResponse(
+        'The q string must be set with the advanced query options'
+      ));
+      return;
+    }
+
+    let params;
+    try {
+      params = JSON.parse(query);
+    } catch (err) {
+      res.status(500).json(new jsonResponse(
+        `Unable to convert q from JSON: ${err}`
+      ));
+      return;
+    }
+
+    // TODO: set up offset and limit
+    const helper = new Helper(
+      modelName,
+      [],
+      DEFAULT_RETURN_LIMIT
+    );
+
+    const results = await helper.advancedSearch(params);
+    res.status(200).json(new jsonResponse(null, results));
+  });
 module.exports = router;

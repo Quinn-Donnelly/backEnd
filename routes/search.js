@@ -85,6 +85,24 @@ router.route('/advanced/:model')
       return;
     }
 
+    let limit;
+    let offset;
+    try {
+      if (req.query && req.query.limit && !isNaN(parseInt(req.query.limit))) {
+        limit = parseInt(req.query.limit);
+      } else {
+        limit = DEFAULT_RETURN_LIMIT;
+      }
+
+      if (req.query && req.query.offset && !isNaN(parseInt(req.query.offset))) {
+        offset = parseInt(req.query.offset);
+      } else {
+        offset = 0;
+      }
+    } catch (err) {
+      res.status(400).json(new jsonResponse(err));
+    }
+
     const query = (req.query.q) ? req.query.q : null;
     if (!query) {
       res.status(400).json(new jsonResponse(
@@ -103,14 +121,19 @@ router.route('/advanced/:model')
       return;
     }
 
-    // TODO: set up offset and limit
     const helper = new Helper(
       modelName,
       [],
-      DEFAULT_RETURN_LIMIT
+      limit
     );
 
-    const results = await helper.advancedSearch(params);
+    let results;
+    try {
+      results = await helper.advancedSearch(params, {limit, offset});
+    } catch (err) {
+      res.status(500).josn(new jsonResponse(err));
+      return;
+    }
     res.status(200).json(new jsonResponse(null, results));
   });
 module.exports = router;

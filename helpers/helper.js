@@ -116,10 +116,17 @@ class Helper {
   }
 
   /**
-   * [advancedSearch description]
-   * @param  {[type]} query   [description]
-   * @param  {[type]} options [description]
-   * @return {[type]}         [description]
+  * Queries using advanced options (use AdvancedQuery class to generate query
+  *                                 string)
+  * @param  {STRING}  query   This should be an object with details for advanced
+  *                           search
+  * @param  {Object}  options This will set the options for the query
+  *                           (Optional)
+  * @param  {integer}  options.limit      How many docs to Returns
+  * @param  {integer}  options.offset     Where to begin the query
+  *                                     (allow user to get next if using limit)
+  * @return {Promise}             Will return error or an array with results
+  *                               of query
    */
   advancedSearch(query, options) {
     return new Promise(async (resolve, reject) => {
@@ -186,7 +193,7 @@ class Helper {
           });
         }
       }
-      console.log(searchParams);
+
       const results = await models[this.modelName].findAll(
         {
           limit,
